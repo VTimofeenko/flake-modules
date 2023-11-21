@@ -95,11 +95,11 @@ let
 in
 {
   options.perSystem = mkPerSystemOption ({ config, pkgs, system, ... }: {
-    options.useDeployRs = mkEnableOption "deploy-rs support";
+    options.deployCmds.useDeployRs = mkEnableOption "deploy-rs support";
     config.devshells.default =
       {
         env = [ ];
-        commands = allCommands { inherit pkgs system; inherit (config) useDeployRs; };
+        commands = allCommands { inherit pkgs system; inherit (config.deployCmds) useDeployRs; };
         packages = [ ];
       };
   });
