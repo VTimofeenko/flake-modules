@@ -42,7 +42,7 @@ let
                 mkCmd = machineName:
                   if useDeployRs
                   then
-                    "${lib.getExe deploy-rs.packages.${system}.default} -s \${PRJ_ROOT}#${machineName}"
+                    "${lib.getExe' deploy-rs.packages.${system}.default "deploy"} -s \${PRJ_ROOT}#${machineName}"
                   else "nixos-rebuild --flake \${PRJ_ROOT}#${machineName} --target-host root@${machineName}.home.arpa switch";
                 machines =
                   if useDeployRs then
