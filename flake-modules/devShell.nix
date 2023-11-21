@@ -44,7 +44,10 @@ let
                   then
                     assert deploy-rs-input != { }; "${deploy-rs-input.packages.${system}.default} -s \${PRJ_ROOT}#${machineName}"
                   else "nixos-rebuild --flake \${PRJ_ROOT}#${machineName} --target-host root@${machineName}.home.arpa switch";
-                machines = if useDeployRs then self.deploy.nodes else self.nixosConfigurations;
+                machines =
+                  if useDeployRs then
+                    (self.deploy.nodes or (lib.warn "No deploy.nodes specified in the flake.nix, using empty list" [ ]))
+                  else self.nixosConfigurations;
               in
               (map
                 (machineName: {
