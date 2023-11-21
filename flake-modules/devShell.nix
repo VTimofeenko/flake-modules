@@ -112,5 +112,6 @@ in
       };
   });
   # TODO: auto-generate flake.deploy.nodes output
+  # TODO: separate out the deployment commands
 }
 
