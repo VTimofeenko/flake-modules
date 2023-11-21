@@ -1,10 +1,17 @@
 # flake module that brings in the deployment commands
-withSystem:
+{ flake-parts-lib, lib, ... }:
+let
+  inherit (flake-parts-lib) mkPerSystemOption;
+  inherit (lib) mkEnableOption;
+in
 { lib, self, ... }:
 let
   /* Attrset of lists of devshell commands. Output of this module. */
   allCommands =
-    pkgs:
+    { pkgs
+    , useDeployRs ? false
+    , ...
+    }:
     let
       /* Builds a derivation and then turns its main executable into a string.
 
@@ -26,13 +33,21 @@ let
             The local machine deployment command is aware of running on something other than NixOS and will fall back on home-manager.
             */
             deploy =
+              let
+                mkCmd = machineName:
+                  if useDeployRs
+                  then
+                    "deploy -s \${PRJ_ROOT}#${machineName}"
+                  else "nixos-rebuild --flake \${PRJ_ROOT}#${machineName} --target-host root@${machineName}.home.arpa switch";
+                machines = if useDeployRs then self.deploy.nodes else self.nixosConfigurations;
+              in
               (map
                 (machineName: {
                   help = "Deploy remote ${machineName}";
                   name = "${machineName}"; # 'deploy-' prefix will be added automatically
-                  command = "nixos-rebuild --flake \${PRJ_ROOT}#{machineName} --target-host root@${machineName}.home.arpa switch"; # PRJ_ROOT is set <=> we're in direnv. Prevents extra warnings
+                  command = mkCmd machineName;
                 })
-                (builtins.attrNames self.nixosConfigurations)) ++
+                (builtins.attrNames machines)) ++
               [
                 {
                   help = "Deploy the flake on this machine";
@@ -79,15 +94,14 @@ let
           })); # // { all = builtins.concatLists (builtins.attrValues allCommands); };
 in
 {
-  perSystem = { system, ... }: {
-    # A copy of hello that was defined by this flake, not the user's flake.
-    devshells.default = withSystem system ({ pkgs, ... }:
+  options.perSystem = mkPerSystemOption ({ config, pkgs, system, ... }: {
+    options.useDeployRs = mkEnableOption "deploy-rs support";
+    config.devshells.default =
       {
         env = [ ];
-        commands = allCommands pkgs;
+        commands = allCommands { inherit pkgs system; inherit (config) useDeployRs; };
         packages = [ ];
-      }
-    );
-  };
+      };
+  });
 }
 

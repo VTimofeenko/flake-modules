@@ -18,6 +18,10 @@
       url = "github:numtide/devshell";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+
+    deploy-rs.url = "github:serokell/deploy-rs";
+    deploy-rs.inputs.nixpkgs.follows = "nixpkgs-unstable";
+
   };
 
   outputs = inputs@{ flake-parts, ... }:
@@ -27,7 +31,7 @@
           inherit (inputs.nixpkgs-lib) lib;# A faster way to propagate lib to certain modules
           inherit (flake-parts-lib) importApply;
           flake-modules = {
-            devShellCmds = importApply ./flake-modules/devShell.nix withSystem;
+            devShellCmds = importApply ./flake-modules/devShell.nix { inherit flake-parts-lib lib; };
             precommitHooks = importApply ./flake-modules/preCommit.nix { inherit withSystem; };
             inputsBumper = importApply ./flake-modules/bumpInputs.nix { inherit withSystem lib flake-parts-lib; };
             mkHomeManagerOutputMerge = import ./flake-modules/mkHomeManagerOutputsMerge.nix;
