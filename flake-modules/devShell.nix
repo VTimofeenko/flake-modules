@@ -103,5 +103,6 @@ in
         packages = [ ];
       };
   });
+  # TODO: auto-generate flake.deploy.nodes output
 }
 
