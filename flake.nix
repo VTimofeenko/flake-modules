@@ -31,7 +31,10 @@
           inherit (inputs.nixpkgs-lib) lib;# A faster way to propagate lib to certain modules
           inherit (flake-parts-lib) importApply;
           flake-modules = {
-            devShellCmds = importApply ./flake-modules/devShell.nix { inherit flake-parts-lib lib; };
+            devShellCmds = importApply ./flake-modules/devShell.nix {
+              inherit flake-parts-lib lib;
+              inherit (inputs) deploy-rs;
+            };
             precommitHooks = importApply ./flake-modules/preCommit.nix { inherit withSystem; };
             inputsBumper = importApply ./flake-modules/bumpInputs.nix { inherit withSystem lib flake-parts-lib; };
             mkHomeManagerOutputMerge = import ./flake-modules/mkHomeManagerOutputsMerge.nix;

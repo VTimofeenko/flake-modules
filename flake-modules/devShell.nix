@@ -1,7 +1,7 @@
 # flake module that brings in the deployment commands
 { flake-parts-lib
 , lib
-, deploy-rs-input ? { }
+, deploy-rs
 , ...
 }:
 let
@@ -42,7 +42,7 @@ let
                 mkCmd = machineName:
                   if useDeployRs
                   then
-                    assert deploy-rs-input != { }; "${deploy-rs-input.packages.${system}.default} -s \${PRJ_ROOT}#${machineName}"
+                    "${deploy-rs.packages.${system}.default} -s \${PRJ_ROOT}#${machineName}"
                   else "nixos-rebuild --flake \${PRJ_ROOT}#${machineName} --target-host root@${machineName}.home.arpa switch";
                 machines =
                   if useDeployRs then
