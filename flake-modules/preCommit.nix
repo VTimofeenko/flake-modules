@@ -25,7 +25,7 @@ let shellName = "pre-commit"; in
         {
           help = "Install pre-commit hooks";
           name = "setup-pre-commit-install";
-          command = "nix develop .#${shellName}";
+          command = ''nix develop ''${PRJ_ROOT}#pre-commit --command bash -c "exit"'';
           category = "setup";
         }
       ];
