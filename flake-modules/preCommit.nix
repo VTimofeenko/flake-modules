@@ -11,7 +11,6 @@ let shellName = "pre-commit"; in
         nixpkgs-fmt.enable = true;
         deadnix.enable = true;
         statix.enable = true;
-        stylua.enable = true;
       };
       settings = {
         statix.ignore = [ ".direnv/" ];
