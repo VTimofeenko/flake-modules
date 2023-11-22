@@ -31,7 +31,7 @@
           inherit (inputs.nixpkgs-lib) lib;# A faster way to propagate lib to certain modules
           inherit (flake-parts-lib) importApply;
           flake-modules = {
-            devShellCmds = importApply ./flake-modules/devShell.nix {
+            devShellCmds = importApply ./flake-modules/devShellCmds {
               inherit flake-parts-lib lib;
               inherit (inputs) deploy-rs;
             };
