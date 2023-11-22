@@ -1,5 +1,4 @@
 # flake module that configures pre-commit hooks environment
-# TODO: add this module to the flake outputs for reuse
 { withSystem }:
 let shellName = "pre-commit"; in
 {
