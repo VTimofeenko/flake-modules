@@ -22,7 +22,8 @@
     deploy-rs.url = "github:serokell/deploy-rs";
     deploy-rs.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
-    treefmt-nix.url = "github:numtide/treefmt-nix";
+    # treefmt-nix.url = "github:numtide/treefmt-nix";
+    treefmt-nix.url = "github:VTimofeenko/treefmt-nix?ref=nickel-syntax-fix"; # TODO: move back once #133 is merged upstream
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
   };
@@ -41,7 +42,7 @@
             precommitHooks = importApply ./flake-modules/preCommit.nix { inherit withSystem; };
             inputsBumper = importApply ./flake-modules/bumpInputs.nix { inherit withSystem lib flake-parts-lib; };
             mkHomeManagerOutputMerge = import ./flake-modules/mkHomeManagerOutputsMerge.nix;
-            formatters = importApply ./flake-modules/formatters.nix { inherit withSystem; };
+            formatters = importApply ./flake-modules/formatters.nix { inherit withSystem flake-parts-lib lib; };
           };
         in
         {
