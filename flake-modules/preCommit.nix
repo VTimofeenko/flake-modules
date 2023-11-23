@@ -2,19 +2,20 @@
 { withSystem }:
 let shellName = "pre-commit"; in
 {
-  perSystem = { system, ... }: {
+  perSystem = { system, config, ... }: {
     # This allows to run nix develop .#pre-commit
     # TODO: make easier to compose with default nix shell. Use lib.mkMerge?
     devShells.${shellName} = withSystem system ({ config, ... }: config.pre-commit.devShell);
     pre-commit.settings = withSystem system (_: {
       hooks = {
-        nixpkgs-fmt.enable = true;
+        treefmt.enable = true;
         deadnix.enable = true;
         statix.enable = true;
       };
       settings = {
         statix.ignore = [ ".direnv/" ];
         statix.format = "stderr";
+        treefmt.package = config.treefmt.build.wrapper;
       };
     });
     /* Add a command to install the hooks */
@@ -29,10 +30,9 @@ let shellName = "pre-commit"; in
         }
       ];
       # For manual checks
-      packages = [
-        pkgs.statix
-        pkgs.deadnix
-      ];
+      packages = builtins.attrValues {
+        inherit (pkgs) statix deadnix pre-commit;
+      };
     });
   };
 }

@@ -22,6 +22,9 @@
     deploy-rs.url = "github:serokell/deploy-rs";
     deploy-rs.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs-unstable";
+
   };
 
   outputs = inputs@{ flake-parts, ... }:
@@ -38,18 +41,22 @@
             precommitHooks = importApply ./flake-modules/preCommit.nix { inherit withSystem; };
             inputsBumper = importApply ./flake-modules/bumpInputs.nix { inherit withSystem lib flake-parts-lib; };
             mkHomeManagerOutputMerge = import ./flake-modules/mkHomeManagerOutputsMerge.nix;
+            formatters = importApply ./flake-modules/formatters.nix { inherit withSystem; };
           };
         in
         {
           imports = builtins.concatLists [
             [
+              # Non-local inputs
               inputs.devshell.flakeModule
               inputs.pre-commit-hooks-nix.flakeModule
+              inputs.treefmt-nix.flakeModule
             ]
             [
               flake-modules.devShellCmds
               flake-modules.precommitHooks
               flake-modules.mkHomeManagerOutputMerge
+              flake-modules.formatters
             ]
           ];
           systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin" ];
