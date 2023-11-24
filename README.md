@@ -31,6 +31,7 @@ A live example can be found at my [dotfiles config](https://github.com/VTimofeen
 # Contents
 
 * `devShellCmds` – creates CI commands that can be run at any time from the devshell.
-* `precommitHooks` – contains my commonly used pre-commit configuration.
+* `precommitHooks` – contains my commonly used pre-commit configuration. Also has vim quickfix integration for `deadnix` and `statix`
 * `inputsBumper` – allows quickly bumping a version of a flake input and commit it
 * `mkHomeManagerOutputMerge` – a meta module that allows composing homeManagerModules outputs like it happens with nixosModules
+* `formatters` – my common language formatters list. Can pull individual formatters into development shell (controlled by option)
