@@ -11,37 +11,61 @@ _:
 
   options.perSystem = mkPerSystemOption ({ config, pkgs, ... }:
     {
-      config = {
-        # TODO: make easier to compose with default nix shell. Use lib.mkMerge?
-        devShells.pre-commit = config.pre-commit.devShell;
-        pre-commit.settings = {
-          hooks = {
-            treefmt.enable = true;
-            deadnix.enable = true;
-            statix.enable = true;
+      config =
+        let
+          # Parses deadnix output into vim quickfix
+          deadnix-quickfix = pkgs.writeShellApplication {
+            name = "deadnix-quickfix";
+            runtimeInputs = [ pkgs.jq ];
+            text = ''
+              ${config.pre-commit.settings.hooks.deadnix.entry} -o json | jq -r '.file as $file | .results[] | "\($file):\(.line):\(.column): \(.message)"'
+            '';
           };
-          settings = {
-            statix.ignore = [ ".direnv/" ];
-            statix.format = "stderr";
-            treefmt.package = config.treefmt.build.wrapper;
+          statix-quickfix = pkgs.writeShellApplication {
+            name = "statix-quickfix";
+            runtimeInputs = [ pkgs.jq ];
+            text = ''
+              ORIG="${config.pre-commit.settings.hooks.statix.entry}"
+
+              # Somewhat of a hack to replace whatever format was specified with json
+              CMD=''${ORIG/${config.pre-commit.settings.settings.statix.format}/json}
+
+              # Eval is needed, otherwise some escaping shenanigans happen and direnv is not ignored
+              eval "$CMD" | jq -r '.file as $file | .report[] | .note as $note | .diagnostics[] | "\($file):\(.at.from.line):\(.at.from.column): \($note)"'
+            '';
+          };
+        in
+        {
+          # TODO: make easier to compose with default nix shell. Use lib.mkMerge?
+          devShells.pre-commit = config.pre-commit.devShell;
+          pre-commit.settings = {
+            hooks = {
+              treefmt.enable = true;
+              deadnix.enable = true;
+              statix.enable = true;
+            };
+            settings = {
+              statix.ignore = [ ".direnv/" ];
+              statix.format = "stderr";
+              treefmt.package = config.treefmt.build.wrapper;
+            };
+          };
+          /* Add a command to install the hooks */
+          devshells.default = {
+            env = [ ];
+            commands = [
+              {
+                help = "Install pre-commit hooks";
+                name = "setup-pre-commit-install";
+                command = ''nix develop ''${PRJ_ROOT}#pre-commit --command bash -c "exit"'';
+                category = "setup";
+              }
+            ];
+            # For manual checks
+            packages = (builtins.attrValues {
+              inherit (pkgs) statix deadnix pre-commit;
+            }) ++ [ deadnix-quickfix statix-quickfix ];
           };
         };
-        /* Add a command to install the hooks */
-        devshells.default = {
-          env = [ ];
-          commands = [
-            {
-              help = "Install pre-commit hooks";
-              name = "setup-pre-commit-install";
-              command = ''nix develop ''${PRJ_ROOT}#pre-commit --command bash -c "exit"'';
-              category = "setup";
-            }
-          ];
-          # For manual checks
-          packages = builtins.attrValues {
-            inherit (pkgs) statix deadnix pre-commit;
-          };
-        };
-      };
     });
 }
