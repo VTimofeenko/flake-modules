@@ -39,7 +39,7 @@
               inherit flake-parts-lib lib;
               inherit (inputs) deploy-rs;
             };
-            precommitHooks = importApply ./flake-modules/preCommit.nix { inherit withSystem; };
+            precommitHooks = importApply ./flake-modules/preCommit.nix { inherit flake-parts-lib; };
             inputsBumper = importApply ./flake-modules/bumpInputs.nix { inherit withSystem lib flake-parts-lib; };
             mkHomeManagerOutputMerge = import ./flake-modules/mkHomeManagerOutputsMerge.nix;
             formatters = importApply ./flake-modules/formatters.nix { inherit withSystem flake-parts-lib lib; };
