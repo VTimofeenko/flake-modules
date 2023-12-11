@@ -19,7 +19,7 @@ let
     else "nixos-rebuild --flake \${PRJ_ROOT}#${machineName} --target-host root@${machineName}.home.arpa switch";
   machines =
     if useDeployRs then
-      (self.deploy.nodes or (lib.warn "No deploy.nodes specified in the flake.nix, using empty list" [ ]))
+      (self.deploy.nodes or (lib.warn "No deploy.nodes specified in the flake.nix, using empty set" { }))
     else self.nixosConfigurations;
 in
 map (mkCommandCategory "deploy")
