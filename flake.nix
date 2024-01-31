@@ -43,7 +43,10 @@
             inherit withSystem lib flake-parts-lib;
           };
           mkHomeManagerOutputMerge = import ./flake-modules/mkHomeManagerOutputsMerge.nix;
-          formatters = importApply ./flake-modules/formatters.nix { inherit withSystem flake-parts-lib lib; };
+          formatters = importApply ./flake-modules/formatters.nix {
+            inherit withSystem flake-parts-lib lib;
+            inherit (inputs) nixpkgs-unstable;
+          };
         };
       in
       {

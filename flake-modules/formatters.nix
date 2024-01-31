@@ -1,15 +1,21 @@
 # This file configures treefmt
 # By default -- only configures nixpkgs-fmt as my go-to nix formatter
-{ flake-parts-lib, lib, ... }:
+{
+  flake-parts-lib,
+  lib,
+  nixpkgs-unstable,
+  ...
+}:
 let
   inherit (flake-parts-lib) mkPerSystemOption;
   inherit (lib) mkEnableOption mkOption types;
 in
 _: {
   options.perSystem = mkPerSystemOption (
-    { config, pkgs, ... }:
+    { config, system, ... }:
     let
       cfg = config.format-module;
+      pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
     in
     {
       options.format-module = {
@@ -50,7 +56,7 @@ _: {
           {
             nixfmt = {
               enable = true;
-              package = pkgs.nixfmt-rfc-style;
+              package = pkgs-unstable.nixfmt-rfc-style;
             };
 
             nickel = enableIf "nickel";
