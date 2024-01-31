@@ -10,7 +10,7 @@ let
 in
 _:
 {
-  options.perSystem = mkPerSystemOption ({ config, ... }:
+  options.perSystem = mkPerSystemOption ({ config, pkgs, ... }:
     let
       cfg = config.format-module;
     in
@@ -47,7 +47,10 @@ _:
             enableIf = optionName: { enable = builtins.elem optionName cfg.languages; };
           in
           {
-            nixpkgs-fmt.enable = true; # Always on
+            nixfmt = {
+              enable = true;
+              package = pkgs.nixfmt-rfc-style;
+            };
 
             nickel = enableIf "nickel";
 
