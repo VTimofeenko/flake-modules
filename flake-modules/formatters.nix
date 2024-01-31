@@ -1,37 +1,38 @@
 # This file configures treefmt
 # By default -- only configures nixpkgs-fmt as my go-to nix formatter
-{ flake-parts-lib
-, lib
-, ...
-}:
+{ flake-parts-lib, lib, ... }:
 let
   inherit (flake-parts-lib) mkPerSystemOption;
   inherit (lib) mkEnableOption mkOption types;
 in
-_:
-{
-  options.perSystem = mkPerSystemOption ({ config, pkgs, ... }:
+_: {
+  options.perSystem = mkPerSystemOption (
+    { config, pkgs, ... }:
     let
       cfg = config.format-module;
     in
     {
       options.format-module = {
         languages = mkOption {
-          type = with types; (listOf (enum [
-            # "python" # TODO: test
-            # "config"
-            "nickel"
-            # "go"
-            # "hcl" # TODO: test
-            # "terraform" # TODO: test
-            "rust"
-            # "markdown" # TODO: think
-            "shell"
-            "scala"
-            "lua"
-            # yaml # TODO: maybe?
-            # prettier # TODO: needed?
-          ]));
+          type =
+            with types;
+            (listOf (
+              enum [
+                # "python" # TODO: test
+                # "config"
+                "nickel"
+                # "go"
+                # "hcl" # TODO: test
+                # "terraform" # TODO: test
+                "rust"
+                # "markdown" # TODO: think
+                "shell"
+                "scala"
+                "lua"
+                # yaml # TODO: maybe?
+                # prettier # TODO: needed?
+              ]
+            ));
           description = "Which langs to pull in";
           default = [ ];
         };
@@ -84,10 +85,13 @@ _:
           };
         projectRootFile = "flake.nix";
       };
-      config.devshells.default.packages = [
-        config.treefmt.build.wrapper # Pull in pre-configured treefmt
-      ]
-      ++ (if cfg.addFormattersToDevshell then (builtins.attrValues config.treefmt.build.programs) else [ ]);
-
-    });
+      config.devshells.default.packages =
+        [
+          config.treefmt.build.wrapper # Pull in pre-configured treefmt
+        ]
+        ++ (
+          if cfg.addFormattersToDevshell then (builtins.attrValues config.treefmt.build.programs) else [ ]
+        );
+    }
+  );
 }

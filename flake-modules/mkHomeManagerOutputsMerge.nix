@@ -1,19 +1,14 @@
 # Flake module that declares flake.homeManagerModules outputs and how to merge it
-{ lib
+{
+  lib,
   # , self
-, flake-parts-lib
-, moduleLocation
-, ...
+  flake-parts-lib,
+  moduleLocation,
+  ...
 }:
 let
-  inherit (lib)
-    mapAttrs
-    mkOption
-    types
-    ;
-  inherit (flake-parts-lib)
-    mkSubmoduleOptions
-    ;
+  inherit (lib) mapAttrs mkOption types;
+  inherit (flake-parts-lib) mkSubmoduleOptions;
 in
 {
   options = {
@@ -21,7 +16,12 @@ in
       homeManagerModules = mkOption {
         type = types.lazyAttrsOf types.unspecified;
         default = { };
-        apply = mapAttrs (k: v: { _file = "${toString moduleLocation}#homeManagerModules.${k}"; imports = [ v ]; });
+        apply = mapAttrs (
+          k: v: {
+            _file = "${toString moduleLocation}#homeManagerModules.${k}";
+            imports = [ v ];
+          }
+        );
         description = ''
           Home Manager modules.
 

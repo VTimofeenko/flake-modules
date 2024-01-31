@@ -1,7 +1,4 @@
-{ pkgs
-, lib
-, ...
-}:
+{ pkgs, lib, ... }:
 let
   inherit (import ./lib.nix { inherit pkgs lib; }) mkCommandCategory commandBuildHelper;
 in
@@ -19,8 +16,7 @@ map (mkCommandCategory "ci") [
   {
     help = "Lint all the code. Managed through pre-commit.";
     name = "lint-all";
-    command = ''
-      nix develop ''${PRJ_ROOT}#pre-commit --command bash -c "pre-commit run --all-files"'';
+    command = ''nix develop ''${PRJ_ROOT}#pre-commit --command bash -c "pre-commit run --all-files"'';
   }
   # TODO: implement
   # {

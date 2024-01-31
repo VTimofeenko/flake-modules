@@ -1,15 +1,13 @@
 # flake module that configures pre-commit hooks environment
-{ flake-parts-lib
-, ...
-}:
+{ flake-parts-lib, ... }:
 let
   inherit (flake-parts-lib) mkPerSystemOption;
 in
-_:
-{
+_: {
   # NOTE: this approach makes the configuration composable with whatever a downstream flake defines
 
-  options.perSystem = mkPerSystemOption ({ config, pkgs, ... }:
+  options.perSystem = mkPerSystemOption (
+    { config, pkgs, ... }:
     {
       config =
         let
@@ -50,7 +48,7 @@ _:
               treefmt.package = config.treefmt.build.wrapper;
             };
           };
-          /* Add a command to install the hooks */
+          # Add a command to install the hooks
           devshells.default = {
             env = [ ];
             commands = [
@@ -62,10 +60,12 @@ _:
               }
             ];
             # For manual checks
-            packages = (builtins.attrValues {
-              inherit (pkgs) statix deadnix pre-commit;
-            }) ++ [ deadnix-quickfix statix-quickfix ];
+            packages = (builtins.attrValues { inherit (pkgs) statix deadnix pre-commit; }) ++ [
+              deadnix-quickfix
+              statix-quickfix
+            ];
           };
         };
-    });
+    }
+  );
 }

@@ -9,7 +9,8 @@ let
 in
 
 {
-  options.perSystem = mkPerSystemOption ({ config, pkgs, ... }:
+  options.perSystem = mkPerSystemOption (
+    { config, pkgs, ... }:
     let
       cfg = config.bumpInputs;
     in
@@ -43,16 +44,20 @@ in
                   # assert builtins.elem inputName (builtins.attrNames self.inputs);
                   "Bump input ${inputName}";
                 name = "flake-bump-${inputName}";
-                command = /* bash */ "${pkgs.lib.getExe bumpScript} ${inputName}";
+                command = # bash
+                  "${pkgs.lib.getExe bumpScript} ${inputName}";
                 category = "flake management";
               })
-              cfg.changingInputs)
+              cfg.changingInputs
+            )
             ++ lib.optional cfg.bumpAllInputs {
               help = "Bump all inputs";
               name = "flake-bump-all-inputs";
-              command = /* bash */ "${pkgs.lib.getExe bumpScript}";
+              command = # bash
+                "${pkgs.lib.getExe bumpScript}";
               category = "flake management";
             };
         };
-    });
+    }
+  );
 }
