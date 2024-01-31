@@ -60,10 +60,13 @@ _: {
               }
             ];
             # For manual checks
-            packages = (builtins.attrValues { inherit (pkgs) statix deadnix pre-commit; }) ++ [
-              deadnix-quickfix
-              statix-quickfix
-            ];
+            packages =
+              (builtins.attrValues { inherit (config.pre-commit.pkgs) statix deadnix; })
+              ++ [ config.pre-commit.settings.package ]
+              ++ [
+                deadnix-quickfix
+                statix-quickfix
+              ];
           };
         };
     }
