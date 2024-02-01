@@ -8,11 +8,21 @@
 }:
 let
   inherit (flake-parts-lib) mkPerSystemOption;
-  inherit (lib) mkEnableOption mkOption types;
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    types
+    recursiveUpdate
+    ;
 in
 _: {
   options.perSystem = mkPerSystemOption (
-    { config, system, ... }:
+    {
+      config,
+      system,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.format-module;
       pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
@@ -48,47 +58,86 @@ _: {
         programs =
           let
             # enableIf :: str -> { enable: bool }
-            #  
-            # Returns a treefmt configuration attrset for a given option 
+            #
+            # Returns a treefmt configuration attrset for a given option
             # if the supplied string is present in the options.formatters
             enableIf = optionName: { enable = builtins.elem optionName cfg.languages; };
           in
-          {
-            nixfmt = {
-              enable = true;
-              package = pkgs-unstable.nixfmt-rfc-style;
+          recursiveUpdate
+            {
+              nixfmt.enable = true;
+
+              nickel = enableIf "nickel";
+
+              rustfmt = enableIf "rust";
+
+              shellcheck = enableIf "shell";
+
+              # black = enableIf "python";
+              # ruff = enableIf "python";
+              # isort = enableIf "python";
+
+              # dprint = enableIf "config"
+
+              # gofmt = enableIf "go"
+
+              # hclfmt = enableIf "hcl"
+              # terraform = enableIf "hcl"
+
+              # mdformat = enableIf "markdown"
+
+              scalafmt = enableIf "scala";
+
+              # deadnix.enable # maybe, dup
+              # statix.enable # Maybe, dup
+
+              stylua = enableIf "lua";
+
+              # yamlfmt = enableIf "yaml";
+
+              # prettier = enableIf "prettier"
+            }
+            {
+              # Certain formatters always write formatted code back into files breaking treefmt
+              # This workaround uses md5sum to compare files before and after
+              # If the sums differ -- do the actual write
+              # This effectively runs the formatters twice and de-parallelizes them which is super suboptimal
+              nickel.package = pkgs.writeShellApplication {
+                name = "nickel-treefmt-wrapper";
+                runtimeInputs = [
+                  pkgs.nickel
+                  pkgs.coreutils
+                ];
+                text = ''
+                  set -x
+                  shift
+                  for file in "$@"; do
+                    ORIG_MD5=$(md5sum "$file" | cut -d ' ' -f 1)
+                    NEW_MD5=$(nickel format < "$file" | md5sum | cut -d ' ' -f 1)
+                    if [ "$ORIG_MD5" != "$NEW_MD5" ]; then
+                      nickel format "$file"
+                    fi
+                  done
+                '';
+              };
+              nixfmt.package = pkgs.writeShellApplication {
+                name = "nixfmt-rfc-style-treefmt-wrapper";
+                runtimeInputs = [
+                  pkgs-unstable.nixfmt-rfc-style
+                  pkgs.coreutils
+                ];
+                text = ''
+                  set -x
+                  for file in "$@"; do
+                    ORIG_MD5=$(md5sum "$file" | cut -d ' ' -f 1)
+                    NEW_MD5=$(nixfmt < "$file" | md5sum | cut -d ' ' -f 1)
+                    if [ "$ORIG_MD5" != "$NEW_MD5" ]; then
+                      nixfmt "$file"
+                    fi
+                  done
+                '';
+              };
             };
-
-            nickel = enableIf "nickel";
-
-            rustfmt = enableIf "rust";
-
-            shellcheck = enableIf "shell";
-
-            # black = enableIf "python";
-            # ruff = enableIf "python";
-            # isort = enableIf "python";
-
-            # dprint = enableIf "config"
-
-            # gofmt = enableIf "go"
-
-            # hclfmt = enableIf "hcl"
-            # terraform = enableIf "hcl"
-
-            # mdformat = enableIf "markdown"
-
-            scalafmt = enableIf "scala";
-
-            # deadnix.enable # maybe, dup
-            # statix.enable # Maybe, dup
-
-            stylua = enableIf "lua";
-
-            # yamlfmt = enableIf "yaml";
-
-            # prettier = enableIf "prettier"
-          };
         projectRootFile = "flake.nix";
       };
       config.devshells.default.packages =
@@ -96,7 +145,15 @@ _: {
           config.treefmt.build.wrapper # Pull in pre-configured treefmt
         ]
         ++ (
-          if cfg.addFormattersToDevshell then (builtins.attrValues config.treefmt.build.programs) else [ ]
+          if cfg.addFormattersToDevshell then
+            (
+              builtins.attrValues config.treefmt.build.programs
+              ++ lib.optionals (builtins.elem "nickel" cfg.languages) [
+                (pkgs.nickel.overrideAttrs { meta.mainProgram = "nickel"; })
+              ]
+            )
+          else
+            [ ]
         );
     }
   );
