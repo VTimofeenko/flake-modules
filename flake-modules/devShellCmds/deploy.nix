@@ -27,14 +27,11 @@ let
 in
 map (mkCommandCategory "deploy") (
   if enable then
-    (map
-      (machineName: {
-        help = "Deploy remote ${machineName}";
-        name = "${machineName}"; # 'deploy-' prefix will be added automatically
-        command = mkCmd machineName;
-      })
-      (builtins.attrNames machines)
-    )
+    (map (machineName: {
+      help = "Deploy remote ${machineName}";
+      name = "${machineName}"; # 'deploy-' prefix will be added automatically
+      command = mkCmd machineName;
+    }) (builtins.attrNames machines))
     ++ (
       if localDeployment then
         [

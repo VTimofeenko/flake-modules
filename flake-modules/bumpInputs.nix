@@ -35,21 +35,18 @@ in
         in
         {
           commands =
-            (map
-              (inputName: {
-                help =
-                  # NOTE: this would somehow need access to outer args of the flake. self is not passed to the perSystem
+            (map (inputName: {
+              help =
+                # NOTE: this would somehow need access to outer args of the flake. self is not passed to the perSystem
 
-                  # Double-check that the input actually exists
-                  # assert builtins.elem inputName (builtins.attrNames self.inputs);
-                  "Bump input ${inputName}";
-                name = "flake-bump-${inputName}";
-                command = # bash
-                  "${pkgs.lib.getExe bumpScript} ${inputName}";
-                category = "flake management";
-              })
-              cfg.changingInputs
-            )
+                # Double-check that the input actually exists
+                # assert builtins.elem inputName (builtins.attrNames self.inputs);
+                "Bump input ${inputName}";
+              name = "flake-bump-${inputName}";
+              command = # bash
+                "${pkgs.lib.getExe bumpScript} ${inputName}";
+              category = "flake management";
+            }) cfg.changingInputs)
             ++ lib.optional cfg.bumpAllInputs {
               help = "Bump all inputs";
               name = "flake-bump-all-inputs";

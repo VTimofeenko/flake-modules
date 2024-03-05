@@ -32,23 +32,21 @@ _: {
         languages = mkOption {
           type =
             with types;
-            (listOf (
-              enum [
-                # "python" # TODO: test
-                # "config"
-                "nickel"
-                # "go"
-                # "hcl" # TODO: test
-                # "terraform" # TODO: test
-                "rust"
-                # "markdown" # TODO: think
-                "shell"
-                "scala"
-                "lua"
-                # yaml # TODO: maybe?
-                # prettier # TODO: needed?
-              ]
-            ));
+            (listOf (enum [
+              # "python" # TODO: test
+              # "config"
+              "nickel"
+              # "go"
+              # "hcl" # TODO: test
+              # "terraform" # TODO: test
+              "rust"
+              # "markdown" # TODO: think
+              "shell"
+              "scala"
+              "lua"
+              # yaml # TODO: maybe?
+              # prettier # TODO: needed?
+            ]));
           description = "Which langs to pull in";
           default = [ ];
         };
