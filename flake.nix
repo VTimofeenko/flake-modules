@@ -62,6 +62,7 @@
             flake-modules.precommitHooks
             flake-modules.mkHomeManagerOutputMerge
             flake-modules.formatters
+            flake-modules.inputsBumper
           ]
         ];
         systems = [
@@ -70,6 +71,7 @@
           "aarch64-darwin"
           "x86_64-darwin"
         ];
+        perSystem = _: { bumpInputs.bumpAllInputs = true; };
         flake = {
           inherit flake-modules;
         };
