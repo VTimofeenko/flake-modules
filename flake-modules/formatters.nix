@@ -4,6 +4,8 @@
   flake-parts-lib,
   lib,
   nixpkgs-unstable,
+  withSystem,
+  self,
   ...
 }:
 let
@@ -155,4 +157,69 @@ _: {
         );
     }
   );
+  config.perSystem =
+    { system, ... }:
+    {
+      packages = withSystem system (
+        { pkgs, ... }:
+        {
+          /**
+            Produces an output for ruff wrapped with my commonly used parameters.
+
+            Useful in case I have a scratch project where I don't bother with flake.nix or pyproject.toml
+          */
+          ruff = pkgs.writeShellApplication {
+            name = "ruff";
+            runtimeInputs = [ pkgs.ruff ];
+            text =
+              let
+                settingsFormat = pkgs.formats.toml { };
+                ruffConfig = {
+                  line-length = 120;
+                  lint = {
+                    select = [
+                      "A" # flake builtins
+                      "D" # docstyle, very angry
+                      "N" # pep8-naming
+                      "TID" # for banned inputs
+                    ];
+                    pydocstyle.convention = "pep257";
+                  };
+                };
+              in
+              ''
+                ruff check --config ${settingsFormat.generate "ruff.toml" ruffConfig} "$@"
+              '';
+          };
+        }
+      );
+      checks = withSystem system (
+        { pkgs, ... }:
+        {
+          test-ruff = pkgs.testers.runNixOSTest {
+            name = "check-my-ruff-formatter-works";
+
+            nodes.machine =
+              { pkgs, ... }:
+              {
+                environment.systemPackages = [ self.packages.${pkgs.system}.ruff ];
+              };
+
+            testScript =
+              # python
+              ''
+                print("AAA")
+                file = "/tmp/test.py"
+                docstring = "docstring"
+
+                machine.execute(f"echo \"'{docstring}'\" > {file}")
+                machine.execute(f"ruff --fix {file}")
+
+                result = machine.execute(f"cat {file}")
+                assert result[1] == f"\"\"\"{docstring}\"\"\"\n", f"Something went wrong, got: {result} after ruff fix"
+              '';
+          };
+        }
+      );
+    };
 }

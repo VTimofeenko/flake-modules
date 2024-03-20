@@ -27,7 +27,7 @@
   };
 
   outputs =
-    inputs@{ flake-parts, ... }:
+    inputs@{ flake-parts, self, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } (
       { withSystem, flake-parts-lib, ... }:
       let
@@ -44,7 +44,12 @@
           };
           mkHomeManagerOutputMerge = import ./flake-modules/mkHomeManagerOutputsMerge.nix;
           formatters = importApply ./flake-modules/formatters.nix {
-            inherit withSystem flake-parts-lib lib;
+            inherit
+              withSystem
+              flake-parts-lib
+              lib
+              self
+              ;
             inherit (inputs) nixpkgs-unstable;
           };
         };
