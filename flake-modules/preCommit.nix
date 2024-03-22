@@ -26,7 +26,7 @@ _: {
               ORIG="${config.pre-commit.settings.hooks.statix.entry}"
 
               # Somewhat of a hack to replace whatever format was specified with json
-              CMD=''${ORIG/${config.pre-commit.settings.settings.statix.format}/json}
+              CMD=''${ORIG/${config.pre-commit.settings.hooks.statix.settings.format}/json}
 
               # Eval is needed, otherwise some escaping shenanigans happen and direnv is not ignored
               eval "$CMD" | jq -r '.file as $file | .report[] | .note as $note | .diagnostics[] | "\($file):\(.at.from.line):\(.at.from.column): \($note)"'
@@ -40,11 +40,15 @@ _: {
             hooks = {
               treefmt.enable = true;
               deadnix.enable = true;
-              statix.enable = true;
+              statix = {
+                enable = true;
+                settings = {
+                  ignore = [ ".direnv/" ];
+                  format = "stderr";
+                };
+              };
             };
             settings = {
-              statix.ignore = [ ".direnv/" ];
-              statix.format = "stderr";
               treefmt.package = config.treefmt.build.wrapper;
             };
           };
