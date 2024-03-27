@@ -164,18 +164,30 @@ _: {
         { pkgs, ... }:
         {
           /**
-            Produces an output for ruff wrapped with my commonly used parameters.
+            Produces a python formatter with my commonly used parameters.
 
             Useful in case I have a scratch project where I don't bother with flake.nix or pyproject.toml
+
+            Uses a combination of `ruff` and `black` with `ruff` doing the heavy lifting. `black` does a little better indenting code like this:
+
+            ```
+            f = fun("param1",
+              "param2"
+              )
+            ```
           */
-          ruff = pkgs.writeShellApplication {
-            name = "ruff";
-            runtimeInputs = [ pkgs.ruff ];
+          my-python-formatter = pkgs.writeShellApplication {
+            name = "i-dont-care-just-format-my-python-code-and-yell-at-me";
+            runtimeInputs = [
+              pkgs.ruff
+              pkgs.black
+            ];
             text =
               let
                 settingsFormat = pkgs.formats.toml { };
+                line-length = 120;
                 ruffConfig = {
-                  line-length = 120;
+                  inherit line-length;
                   format.quote-style = "double";
                   lint = {
                     select = [
@@ -230,7 +242,9 @@ _: {
                 };
               in
               ''
-                ruff check --config ${settingsFormat.generate "ruff.toml" ruffConfig} "$@"
+                set -x
+                ruff check --config ${settingsFormat.generate "ruff.toml" ruffConfig} --fix --preview "$@"
+                black --line-length 120 "$@"
               '';
           };
         }
@@ -238,13 +252,13 @@ _: {
       checks = withSystem system (
         { pkgs, ... }:
         {
-          test-ruff = pkgs.testers.runNixOSTest {
+          test-python-formatter = pkgs.testers.runNixOSTest {
             name = "check-my-ruff-formatter-works";
 
             nodes.machine =
               { pkgs, ... }:
               {
-                environment.systemPackages = [ self.packages.${pkgs.system}.ruff ];
+                environment.systemPackages = [ self.packages.${pkgs.system}.my-python-formatter ];
               };
 
             testScript =
@@ -255,7 +269,7 @@ _: {
                 docstring = "docstring"
 
                 machine.execute(f"echo \"'{docstring}'\" > {file}")
-                machine.execute(f"ruff --fix {file}")
+                machine.execute(f"i-dont-care-just-format-my-python-code-and-yell-at-me --fix {file}")
 
                 result = machine.execute(f"cat {file}")
                 assert result[1] == f"\"\"\"{docstring}\"\"\"\n", f"Something went wrong, got: {result} after ruff fix"
