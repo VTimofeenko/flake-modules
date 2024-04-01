@@ -15,6 +15,7 @@ in
       config,
       pkgs,
       system,
+      self',
       ...
     }:
     {
@@ -30,6 +31,7 @@ in
           };
           # generateDeployNodes = mkEnableOption "Auto-populate flake.deploy.nodes output";
         };
+        appCmds = mkEnableOption "Add the flake's apps as devshell commands";
       };
 
       config.devshells.default = {
@@ -48,7 +50,19 @@ in
             };
             ciCmds = import ./ci.nix { inherit pkgs lib; };
           in
-          mkDeployCmds ++ ciCmds;
+          mkDeployCmds
+          ++ ciCmds
+          ++ (
+            if config.devshellCmds.appCmds then
+              (map (app: {
+                name = app;
+                command = "(cd $PRJ_ROOT && nix run .#${app})";
+                help = "Run this flake's app '${app}'";
+                category = "flake apps";
+              }) (builtins.attrNames self'.apps))
+            else
+              [ ]
+          );
         packages = [ ];
       };
     }
