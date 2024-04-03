@@ -38,7 +38,10 @@ _: {
           devShells.pre-commit = config.pre-commit.devShell;
           pre-commit.settings = {
             hooks = {
-              treefmt.enable = true;
+              treefmt = {
+                enable = true;
+                package = config.treefmt.build.wrapper;
+              };
               deadnix.enable = true;
               statix = {
                 enable = true;
@@ -47,9 +50,6 @@ _: {
                   format = "stderr";
                 };
               };
-            };
-            settings = {
-              treefmt.package = config.treefmt.build.wrapper;
             };
           };
           # Add a command to install the hooks
