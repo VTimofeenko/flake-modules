@@ -269,7 +269,7 @@ _: {
                 docstring = "docstring"
 
                 machine.execute(f"echo \"'{docstring}'\" > {file}")
-                machine.execute(f"i-dont-care-just-format-my-python-code-and-yell-at-me --fix {file}")
+                machine.execute(f"i-dont-care-just-format-my-python-code-and-yell-at-me {file}")
 
                 result = machine.execute(f"cat {file}")
                 assert result[1] == f"\"\"\"{docstring}\"\"\"\n", f"Something went wrong, got: {result} after ruff fix"
