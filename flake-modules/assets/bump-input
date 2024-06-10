@@ -18,6 +18,16 @@ else
     echo "⬆️ Bumping input ${INPUTNAME}"
 fi
 
+echo "❔Checking pre-commit config"
+
+# Without this check, subsequent commit will definitely fail because of hooks
+if file -E .pre-commit-config.yaml; then
+    echo ".pre-commit-config exists and is not a broken symlink"
+else
+    echo "Installing pre-commit-config"
+    nix develop .#pre-commit --command bash -c "exit"
+fi
+
 # Optional validation -- abort if there's an uncommitted write to flake.lock
 # if [[ $(cd "$GIT_ROOT" && git status --porcelain flake.lock) ]]; then
 #     echo "❌flake.lock has uncommitted changes. Commit before proceeding"
