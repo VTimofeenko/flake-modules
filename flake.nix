@@ -59,6 +59,19 @@
             inherit (inputs) nixpkgs-unstable;
           };
         };
+
+        # Modules that are dogfed go here
+        dogfood = {
+          emacsElispAutofmt = importApply ./flake-modules/elispAutofmt {
+            inherit
+              flake-parts-lib
+              lib
+              withSystem
+              self
+              ;
+            src = inputs.emacs-elisp-autofmt;
+          };
+        };
       in
       {
         imports = builtins.concatLists [
@@ -75,6 +88,7 @@
             flake-modules.formatters
             flake-modules.inputsBumper
           ]
+          (builtins.attrValues dogfood)
         ];
         systems = [
           "x86_64-linux"
