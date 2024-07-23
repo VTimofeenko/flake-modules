@@ -43,6 +43,22 @@
         "type": "github"
       }
     },
+    "emacs-elisp-autofmt": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1718581552,
+        "narHash": "sha256-f5xeGU/qOg5BjYWolStNKw2NX8WwQl1H5WtvwC8N5IY=",
+        "ref": "refs/heads/main",
+        "rev": "98edd8158b778ff9a0e34b5c6615523c0035f8d6",
+        "revCount": 293,
+        "type": "git",
+        "url": "https://codeberg.org/ideasman42/emacs-elisp-autofmt"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://codeberg.org/ideasman42/emacs-elisp-autofmt"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -213,6 +229,7 @@
       "inputs": {
         "deploy-rs": "deploy-rs",
         "devshell": "devshell",
+        "emacs-elisp-autofmt": "emacs-elisp-autofmt",
         "flake-parts": "flake-parts",
         "nixpkgs": [
           "nixpkgs-unstable"

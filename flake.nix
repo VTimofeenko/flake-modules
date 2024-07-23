@@ -9,6 +9,12 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs-lib";
 
+    # elisp formatter
+    emacs-elisp-autofmt = {
+      url = "git+https://codeberg.org/ideasman42/emacs-elisp-autofmt";
+      flake = false;
+    };
+
     pre-commit-hooks-nix = {
       url = "github:cachix/pre-commit-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
