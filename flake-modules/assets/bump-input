@@ -21,7 +21,7 @@ fi
 echo "❔Checking pre-commit config"
 
 # Without this check, subsequent commit will definitely fail because of hooks
-if file -E .pre-commit-config.yaml; then
+if file -E "$(git rev-parse --show-toplevel)"/.pre-commit-config.yaml; then
     echo ".pre-commit-config exists and is not a broken symlink"
 else
     echo "Installing pre-commit-config"
