@@ -105,7 +105,7 @@ _: {
               nickel.package = pkgs.writeShellApplication {
                 name = "nickel-treefmt-wrapper";
                 runtimeInputs = [
-                  pkgs.nickel
+                  pkgs-unstable.nickel
                   pkgs.coreutils
                 ];
                 text = ''
@@ -149,7 +149,7 @@ _: {
             (
               builtins.attrValues config.treefmt.build.programs
               ++ lib.optionals (builtins.elem "nickel" cfg.languages) [
-                (pkgs.nickel.overrideAttrs { meta.mainProgram = "nickel"; })
+                (pkgs-unstable.nickel.overrideAttrs { meta.mainProgram = "nickel"; })
               ]
             )
           else
