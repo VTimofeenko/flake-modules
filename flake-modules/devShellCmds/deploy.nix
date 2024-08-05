@@ -13,12 +13,16 @@ let
 
   inherit (import ./lib.nix { inherit pkgs lib; }) mkCommandCategory;
 
+  notifySendCmd = lib.getExe' pkgs.libnotify "notify-send";
   mkCmd =
     machineName:
-    if useDeployRs then
-      "${lib.getExe' deploy-rs.packages.${system}.default "deploy"} -s \${PRJ_ROOT}#${machineName}"
-    else
-      "nixos-rebuild --flake \${PRJ_ROOT}#${machineName} --target-host root@${machineName}.home.arpa switch";
+    (
+      if useDeployRs then
+        "${lib.getExe' deploy-rs.packages.${system}.default "deploy"} -s \${PRJ_ROOT}#${machineName} "
+      else
+        "nixos-rebuild --flake \${PRJ_ROOT}#${machineName} --target-host root@${machineName}.home.arpa switch"
+    )
+    + "&& ${notifySendCmd} '${machineName} deployed' -i object-select || ${notifySendCmd} '${machineName} deployment failed' -i window-close";
   machines =
     if useDeployRs then
       (self.deploy.nodes or (lib.warn "No deploy.nodes specified in the flake.nix, using empty set" { }))
