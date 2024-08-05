@@ -42,9 +42,9 @@ map (mkCommandCategory "deploy") (
               # bash
               ''
                 if [[ $(grep -s ^NAME= /etc/os-release | sed 's/^.*=//') == "NixOS" ]]; then
-                sudo nixos-rebuild switch --flake ''${PRJ_ROOT} # PRJ_ROOT is set <=> we're in direnv. Prevents extra warnings
+                  sudo nixos-rebuild switch --flake ''${PRJ_ROOT} # PRJ_ROOT is set <=> we're in direnv. Prevents extra warnings
                 else # Not a NixOS machine
-                home-manager switch --flake ''${PRJ_ROOT}
+                  home-manager switch --flake ''${PRJ_ROOT}
                 fi'';
           }
         ]
