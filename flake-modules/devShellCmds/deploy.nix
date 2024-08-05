@@ -45,11 +45,15 @@ map (mkCommandCategory "deploy") (
             command =
               # bash
               ''
+                set -euo pipefail
+
                 if [[ $(grep -s ^NAME= /etc/os-release | sed 's/^.*=//') == "NixOS" ]]; then
                   sudo nixos-rebuild switch --flake ''${PRJ_ROOT} # PRJ_ROOT is set <=> we're in direnv. Prevents extra warnings
                 else # Not a NixOS machine
                   home-manager switch --flake ''${PRJ_ROOT}
-                fi'';
+                fi
+
+                ${notifySendCmd} 'local deployment done' -i object-select'';
           }
         ]
       else
