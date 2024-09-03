@@ -235,7 +235,6 @@ _: {
                       "E714" # Test for object identity should be is not
                       "E721" # Do not compare types, use isinstance()
                       "E722" # Do not use bare except
-                      "E999" # SyntaxError
                     ];
                     pydocstyle.convention = "pep257";
                   };
@@ -243,8 +242,8 @@ _: {
               in
               ''
                 set -x
-                ruff check --config ${settingsFormat.generate "ruff.toml" ruffConfig} --fix --preview "$@"
                 black --line-length 120 "$@"
+                ruff check --config ${settingsFormat.generate "ruff.toml" ruffConfig} --fix --preview "$@"
               '';
           };
         }
