@@ -9,7 +9,12 @@
   ...
 }:
 let
-  inherit (deploymentConfig) enable useDeployRs localDeployment;
+  inherit (deploymentConfig)
+    enable
+    useDeployRs
+    localDeployment
+    desktopNotifications
+    ;
 
   inherit (import ./lib.nix { inherit pkgs lib; }) mkCommandCategory;
 
@@ -53,7 +58,8 @@ map (mkCommandCategory "deploy") (
                   home-manager switch --flake ''${PRJ_ROOT}
                 fi
 
-                ${notifySendCmd} 'local deployment done' -i object-select'';
+                ${if desktopNotifications then "${notifySendCmd} 'local deployment done' -i object-select" else ""}
+              '';
           }
         ]
       else

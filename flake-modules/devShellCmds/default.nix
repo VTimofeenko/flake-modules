@@ -23,6 +23,7 @@ in
         deployment = {
           enable = mkEnableOption "deployment devshell commands";
           useDeployRs = mkEnableOption "deploy-rs support";
+          desktopNotifications = mkEnableOption "show notification upon deployment";
           localDeployment = mkEnableOption "add deploy-local command";
           deploymentDomain = mkOption {
             type = lib.types.str;
