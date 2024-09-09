@@ -27,7 +27,7 @@ let
       else
         "nixos-rebuild --flake \${PRJ_ROOT}#${machineName} --target-host root@${machineName}.home.arpa switch"
     )
-    + "&& ${notifySendCmd} '${machineName} deployed' -i object-select || ${notifySendCmd} '${machineName} deployment failed' -i window-close";
+    + (lib.optionalString desktopNotifications "&& ${notifySendCmd} '${machineName} deployed' -i object-select || ${notifySendCmd} '${machineName} deployment failed' -i window-close");
   machines =
     if useDeployRs then
       (self.deploy.nodes or (lib.warn "No deploy.nodes specified in the flake.nix, using empty set" { }))
