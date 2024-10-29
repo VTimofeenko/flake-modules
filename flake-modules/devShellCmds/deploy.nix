@@ -23,11 +23,11 @@ let
     machineName:
     (
       if useDeployRs then
-        "${lib.getExe' deploy-rs.packages.${system}.default "deploy"} -s \${PRJ_ROOT}#${machineName} "
+        "${lib.getExe' deploy-rs.packages.${system}.default "deploy"} -s \${PRJ_ROOT}#${machineName} $@"
       else
         "nixos-rebuild --flake \${PRJ_ROOT}#${machineName} --target-host root@${machineName}.home.arpa switch"
     )
-    + (lib.optionalString desktopNotifications "&& ${notifySendCmd} '${machineName} deployed' -i object-select || ${notifySendCmd} '${machineName} deployment failed' -i window-close");
+    + (lib.optionalString desktopNotifications " && ${notifySendCmd} '${machineName} deployed' -i object-select || ${notifySendCmd} '${machineName} deployment failed' -i window-close");
   machines =
     if useDeployRs then
       (self.deploy.nodes or (lib.warn "No deploy.nodes specified in the flake.nix, using empty set" { }))
