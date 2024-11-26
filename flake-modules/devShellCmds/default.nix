@@ -57,7 +57,9 @@ in
                   ;
               };
             in
+            # Add deploy-${node} commands
             mkDeployCmds
+
             ++ (lib.optionals cfg.ci.enable (import ./ci.nix { inherit pkgs lib; }))
 
             # Add commands to run flake apps
