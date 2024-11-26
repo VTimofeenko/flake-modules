@@ -59,17 +59,19 @@ in
             in
             mkDeployCmds
             ++ (lib.optionals cfg.ci.enable (import ./ci.nix { inherit pkgs lib; }))
-            ++ (
-              if config.devshellCmds.appCmds then
+
+            # Add commands to run flake apps
+            ++ (lib.optionals cfg.appCmds (
+              lib.pipe self'.apps [
+                builtins.attrNames
                 (map (app: {
                   name = app;
                   command = "(cd $PRJ_ROOT && nix run .#${app})";
                   help = "Run this flake's app '${app}'";
                   category = "flake apps";
-                }) (builtins.attrNames self'.apps))
-              else
-                [ ]
-            );
+                }))
+              ]
+            ));
           packages = [ ];
         };
     }
