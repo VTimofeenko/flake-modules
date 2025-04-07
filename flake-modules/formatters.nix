@@ -235,6 +235,7 @@ _: {
                       "E714" # Test for object identity should be is not
                       "E721" # Do not compare types, use isinstance()
                       "E722" # Do not use bare except
+                      "I" # `isort`
                     ];
                     pydocstyle.convention = "pep257";
                   };
