@@ -216,7 +216,8 @@ _: {
                       "E252" # Missing whitespace around parameter equals
                       "E261" # Insert at least two spaces before an inline comment
                       "E262" # Inline comment should start with #
-                      "E265" # Block comment should start with #
+                      # This setting breaks nix-based shebangs (see test below)
+                      # "E265" # Block comment should start with #
                       "E266" # Too many leading # before block comment
                       "E271" # Multiple spaces after keyword
                       "E272" # Multiple spaces before keyword
@@ -273,6 +274,16 @@ _: {
 
                 result = machine.execute(f"cat {file}")
                 assert result[1] == f"\"\"\"{docstring}\"\"\"\n", f"Something went wrong, got: {result} after ruff fix"
+
+                test_content = """#!/usr/bin/env nix
+                #!nix shell foo bar
+                """
+                expected_content = test_content
+                file_path = "/tmp/test_multiline.py"
+                machine.execute(f"echo '{test_content}' > {file_path}")
+                machine.execute(f"i-dont-care-just-format-my-python-code-and-yell-at-me {file_path}")
+                result = machine.execute(f"cat {file_path}")
+                assert result[1] == expected_content, f"Multiline test failed. Got: '{result[1]}'. Expected: '{expected_content}'"
               '';
           };
         }
